@@ -1,0 +1,22 @@
+src_dir: "/template_dir"
+template:
+  pymain:
+    directory: "pymain"
+    description: "Python file with only main declared"
+  flask:
+    directory: "flask"
+    description: "Python file to work with Flask"
+    gitignore:
+      - "__pycache__/"
+  article:
+    directory: "latexdoc"
+    description: "LaTeX article, contains package to write math, code, algorithm, show images and use multicol"
+    gitignore:
+      - "*.aux"
+      - "*.log"
+      - "*.out"
+      - "*.toc"
+      - "Makefile"
+  letter:
+    directory: "latexletter"
+    description: "LaTeX Letter"
