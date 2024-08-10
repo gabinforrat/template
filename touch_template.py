@@ -68,6 +68,25 @@ def main():
     # https://docs.python.org/3/library/shutil.html
     shutil.copytree(template_folder,terminal_path,dirs_exist_ok=True)
 
+    created_files = []
+    original_files = list(os.walk(template_folder))
+    count_folder = 0
+    for each in original_files:
+        if count_folder == 0:
+            for sub_dir in each[1]:
+                created_files.append(f"{terminal_path}/{sub_dir}")
+            for sub_file in each[2]:
+                created_files.append(f"{terminal_path}/{sub_file}")
+        else:
+            for sub_dir in each[1]:
+                created_files.append(f"{terminal_path}/{original_files[0][1][count_folder-1]}/{sub_dir}")
+            for sub_file in each[2]:
+                created_files.append(f"{terminal_path}/{original_files[0][1][count_folder-1]}/{sub_file}")
+        count_folder += 1
+
+    for f in created_files:
+        os.utime(f)
+
     if not is_gitignore:
         return 0
 
