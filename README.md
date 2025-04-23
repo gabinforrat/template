@@ -37,3 +37,6 @@ template:
     description: {template's description}
     gitignore: {list of files/directory to ignore in git}
 ```
+
+# Version
+1.0.2
