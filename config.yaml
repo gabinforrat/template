@@ -1,0 +1,12 @@
+src_dir: "/template_dir"
+template:
+  flask:
+    directory: "flask"
+    description: "Python file to work with Flask"
+    gitignore:
+      - "__pycache__/"
+  typescript:
+    directory: "typescript"
+    description: "Typescript basic files, with strict configuration in JavaScript es2016"
+    gitignore:
+      - "/dist"
