@@ -40,3 +40,6 @@ template:
 
 # Version
 1.2.0
+
+- Better option handling
+- Add option to indicate output path  

@@ -2,32 +2,19 @@ import os
 import sys
 import yaml
 import shutil
+import optparse
+from pathlib import Path
 
-
-terminal_path = os.path.abspath(os.getcwd())
-script_path = os.path.dirname(os.path.abspath(__file__))
-with open(f"{script_path}/config.yaml") as file:
+TERMINAL_PATH = os.path.abspath(os.getcwd())
+SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
+with open(f"{SCRIPT_PATH}/config.yaml") as file:
     config = yaml.safe_load(file)
-
-
-
-def help():
-    print("""Usage: template [FLAG] NAME
-Create files and directories following a template in the current directory.
-
-A NAME argument indicates which template will be created.
-
-All available FLAG are as follow:
-    --help : display this help and exit
-    --list : list of all template available, with their name and description
-    --gitignore : add a .gitignore file with files already ignored (if available)
-    """
-    )
 
 def template_list():
     print("List of every template available:")
     for temp in config['template']:
-        print('  %(name)-15s : %(description)s' % {'name':temp,'description':config['template'][temp]['description']})
+        print('  %(name)-15s : %(description)s' %
+            {'name':temp,'description':config['template'][temp]['description']})
 
 def is_template_valid(template):
     for t in config['template']:
@@ -36,37 +23,42 @@ def is_template_valid(template):
     return False
 
 def main():
-    if(len(sys.argv)>3):
-        raise Exception("Too many argument passed. To see the syntax of the command, use --help")
+    usage = """%prog [OPTION]... TEMPLATE
+Create files and directories following a TEMPLATE in the current directory.
+"""
+    parser = optparse.OptionParser(usage)
 
-    is_gitignore = False
-    try:
-        if(sys.argv[1][:2]=="--"):
-            flag = sys.argv[1]
-            if(flag=="--help"):
-                help()
-                return 1
-            elif(flag=="--list"):
-                template_list()
-                return 2
-            elif(flag=="--gitignore"):
-                is_gitignore = True
-                template_option = sys.argv[2]
-        else:
-            flag = ""
-            template_option = sys.argv[1]
-    except Exception as e:
-        raise Exception("This command requires options. Check with --list to see available template. To see the syntax of the command, use --help")
+    parser.add_option("-p","--path", action="store", type="string",
+        dest="output_path", default="", help="path to create the template at")
+    parser.add_option("-l","--list", action="store_true",
+        dest="is_show_list", default=False,
+        help="list of all template available, with their name and description")
+    parser.add_option("-g","--gitignore", action="store_true",
+        dest="is_gitignore", default=False,
+        help="add a .gitignore file with files already ignored (if available)")
 
-    if not is_template_valid(template_option):
-        raise Exception("This template doesn't exist. Check with --list to see available template")
+    (options, args) = parser.parse_args()
 
-    template_dir = f"{script_path}{config['src_dir']}"
-    template_config = config['template'][template_option]
-    template_folder = f"{template_dir}/{template_config['directory']}"
+    if options.is_show_list:
+        template_list()
+        return 1
 
-    # https://docs.python.org/3/library/shutil.html
-    shutil.copytree(template_folder,terminal_path,dirs_exist_ok=True)
+    if len(args) <  1:
+        raise Exception("This command requires options. Check with --list to see"
+            + "available template. To see the syntax of the command, use --help")
+    elif len(args) > 1:
+        print("Error: Too many arguments")
+    elif not is_template_valid(args[0]):
+        raise Exception("This template doesn't exist. Check with --list to see"
+            +"available template")
+
+
+    path_to_output = os.path.abspath(Path(options.output_path))
+    print(f"path_to_output: {path_to_output}")
+    template_config = config['template'][args[0]]
+    template_folder = f"{SCRIPT_PATH}{config['src_dir']}/{template_config['directory']}"
+
+    shutil.copytree(template_folder,path_to_output,dirs_exist_ok=True)
 
     created_files = []
     original_files = list(os.walk(template_folder))
@@ -75,24 +67,24 @@ def main():
     for each in original_files:
         relative_path = each[0].replace(absolute_path,"")
         for sub_dir in each[1]:
-            created_files.append(f"{terminal_path}{relative_path}/{sub_dir}")
+            created_files.append(f"{path_to_output}{relative_path}/{sub_dir}")
         for sub_file in each[2]:
-            created_files.append(f"{terminal_path}{relative_path}/{sub_file}")
+            created_files.append(f"{path_to_output}{relative_path}/{sub_file}")
 
-    for f in created_files:
-        os.utime(f)
+    for file in created_files:
+        os.utime(file)
 
-    if not is_gitignore:
+    if not options.is_gitignore:
         return 0
 
     if "gitignore" not in template_config.keys():
         return 0
 
     try:
-        f = open(f"{terminal_path}/.gitignore",'x')
+        file = open(f"{path_to_output}/.gitignore",'x')
         for ignored_file in template_config['gitignore']:
-            f.write(f"{ignored_file}\n")
-        f.close()
+            file.write(f"{ignored_file}\n")
+        file.close()
     except Exception as e:
         raise e
     return 0
