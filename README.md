@@ -14,18 +14,22 @@ To have access to this script everywhere on your Linux machine, add a line in yo
 alias template="python3 [SCRIPT_PATH]/touch_template.py"
 ```
 
-You'll have
-```sh
-template [FLAG] NAME
+## Help
 ```
-Create files and directories following a template in the current directory.
+Usage: template [OPTION]... TEMPLATE
+Create files and directories following a TEMPLATE in the current directory.
 
-A NAME argument indicates which template will be created.
+Options:
+  -h, --help            show this help message and exit
+  -p OUTPUT_PATH, --path=OUTPUT_PATH
+                        path to create the template at
+  -l, --list            list of all template available, with their name and
+                        description
+  -g, --gitignore       add a .gitignore file with files already ignored (if
+                        available)
+```
 
-All available FLAG are as follow:
-  --help : display this help and exit
-  --list : list of all template available, with their name and description
-  --gitignore : add a .gitignore file with files already ignored (if available)
+
 
 ## Config
 To add or modify templates, add the template files in `template_dir`.
@@ -39,7 +43,4 @@ template:
 ```
 
 # Version
-1.2.0
-
-- Better option handling
-- Add option to indicate output path  
+1.2.1

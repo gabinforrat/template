@@ -43,18 +43,15 @@ Create files and directories following a TEMPLATE in the current directory.
         template_list()
         return 1
 
-    if len(args) <  1:
-        raise Exception("This command requires options. Check with --list to see"
+    if len(args) != 1:
+        raise Exception("This command requires a single argument. Check with --list to see "
             + "available template. To see the syntax of the command, use --help")
-    elif len(args) > 1:
-        print("Error: Too many arguments")
     elif not is_template_valid(args[0]):
         raise Exception("This template doesn't exist. Check with --list to see"
             +"available template")
 
 
     path_to_output = os.path.abspath(Path(options.output_path))
-    print(f"path_to_output: {path_to_output}")
     template_config = config['template'][args[0]]
     template_folder = f"{SCRIPT_PATH}{config['src_dir']}/{template_config['directory']}"
 
